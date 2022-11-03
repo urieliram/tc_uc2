@@ -1,0 +1,2 @@
+ambiente,ruta,executable,emphasys,symmetry,timeheu,timemilp,gap,k,iter,
+localPC,instances/,/home/uriel/cplex1210/cplex/bin/x86-64_linux/cplex,0,-1,250,1000,0.0001,20,30

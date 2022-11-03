@@ -1,0 +1,788 @@
+{
+  "comments": "morales_espania2013,Section_III_D,one_day_spam",
+  "time_periods": 24,
+  "demand": [
+    1101.92	,
+    1008.8	,
+    962.24	,
+    931.2	  ,
+    900.16	,
+    900.16	,
+    931.2	  ,
+    993.28	,
+    1132.96	,
+    1241.6	,
+    1272.64	,
+    1288.16	,
+    1272.64	,
+    1241.6	,
+    1226.08	,
+    1226.08	,
+    1288.16	,
+    1412.32	,
+    1396.8	,
+    1365.76	,
+    1319.2	,
+    1303.68	,
+    1226.08	,
+    1148.48	     
+  ],
+  "reserves": [
+    55.096	,
+    50.44	  ,
+    48.112	,
+    46.56	  ,
+    45.008	,
+    45.008	,
+    46.56	  ,
+    49.664	,
+    56.648	,
+    62.08	  ,
+    63.632	,
+    64.408	,
+    63.632	,
+    62.08	  ,
+    61.304	,
+    61.304	,
+    64.408	,
+    70.616	,
+    69.84	  ,
+    68.288 	,
+    65.96  	,
+    65.184	,
+    61.304	,
+    57.424	       
+  ],
+  "thermal_generators": {
+    "G1_1": {
+      "must_run": 0,
+      "name": "G1",
+      "power_output_minimum": 150,
+      "power_output_maximum": 455,
+      "ramp_up_limit": 225,
+      "ramp_down_limit": 225,
+      "ramp_startup_limit": 150,
+      "ramp_shutdown_limit": 150,
+      "time_up_minimum": 8,
+      "time_down_minimum": 8,
+      "power_output_t0": 150,
+      "unit_on_t0": 1,
+      "time_up_t0": 8,
+      "time_down_t0": 0,
+      "fixed_cost": 1000,
+      "startup": [
+        {
+          "lag": 8,
+          "cost": 4500
+        },
+        {
+          "lag": 14,
+          "cost": 9000
+        },
+        {
+          "lag": 24,
+          "cost": 9000
+        }
+      ],
+      "piecewise_production": [
+        {
+          "mw": 150,
+          "cost": 16.19
+        },
+        {
+          "mw": 177.72727273,
+          "cost": 16.19
+        },
+        {
+          "mw": 205.45454546000002,
+          "cost": 16.19
+        },
+        {
+          "mw": 233.18181819000003,
+          "cost": 16.19
+        },
+        {
+          "mw": 260.90909092000004,
+          "cost": 16.19
+        },
+        {
+          "mw": 288.63636365,
+          "cost": 16.19
+        },
+        {
+          "mw": 316.36363638,
+          "cost": 16.19
+        },
+        {
+          "mw": 344.09090911,
+          "cost": 16.19
+        },
+        {
+          "mw": 371.81818183999997,
+          "cost": 16.19
+        },
+        {
+          "mw": 399.54545456999995,
+          "cost": 16.19
+        },
+        {
+          "mw": 427.2727273,
+          "cost": 16.19
+        },
+        {
+          "mw": 455,
+          "cost": 16.19
+        }
+      ]
+    },
+
+    "G2_1": {
+      "must_run": 0,
+      "name": "G2",
+      "power_output_minimum": 150,
+      "power_output_maximum": 455,
+      "ramp_up_limit": 225,
+      "ramp_down_limit": 225,
+      "ramp_startup_limit": 150,
+      "ramp_shutdown_limit": 150,
+      "time_up_minimum": 8,
+      "time_down_minimum": 8,
+      "power_output_t0": 150,
+      "unit_on_t0": 1,
+      "time_up_t0": 8,
+      "time_down_t0": 0,
+      "fixed_cost": 970,
+      "startup": [
+        {
+          "lag": 8,
+          "cost": 5000
+        },
+        {
+          "lag": 14,
+          "cost": 10000
+        },
+        {
+          "lag": 24,
+          "cost": 10000
+        }
+      ],
+      "piecewise_production": [
+        {
+          "mw": 150,
+          "cost": 17.26
+        },
+        {
+          "mw": 177.72727273,
+          "cost": 17.26
+        },
+        {
+          "mw": 205.45454546000002,
+          "cost": 17.26
+        },
+        {
+          "mw": 233.18181819000003,
+          "cost": 17.26
+        },
+        {
+          "mw": 260.90909092000004,
+          "cost": 17.26
+        },
+        {
+          "mw": 288.63636365,
+          "cost": 17.26
+        },
+        {
+          "mw": 316.36363638,
+          "cost": 17.26
+        },
+        {
+          "mw": 344.09090911,
+          "cost": 17.26
+        },
+        {
+          "mw": 371.81818183999997,
+          "cost": 17.26
+        },
+        {
+          "mw": 399.54545456999995,
+          "cost": 17.26
+        },
+        {
+          "mw": 455,
+          "cost": 17.26
+        }
+      ]
+    },
+
+    "G3_1": {
+      "must_run": 0,
+      "name": "G3",
+      "power_output_minimum": 20,
+      "power_output_maximum": 130,
+      "ramp_up_limit": 50,
+      "ramp_down_limit": 50,
+      "ramp_startup_limit": 20,
+      "ramp_shutdown_limit": 20,
+      "time_up_minimum": 5,
+      "time_down_minimum": 5,
+      "power_output_t0": 20,
+      "unit_on_t0": 1,
+      "time_up_t0": 5,
+      "time_down_t0": 0,
+      "fixed_cost": 700,
+      "startup": [
+        {
+          "lag": 5,
+          "cost": 550
+        },
+        {
+          "lag": 10,
+          "cost": 1100
+        },
+        {
+          "lag": 24,
+          "cost": 1100
+        }
+      ],
+      "piecewise_production": [
+        {
+          "mw": 20,
+          "cost": 16.6
+        },
+        {
+          "mw": 30,
+          "cost": 16.6
+        },
+        {
+          "mw": 40,
+          "cost": 16.6
+        },
+        {
+          "mw": 50,
+          "cost": 16.6
+        },
+        {
+          "mw": 60,
+          "cost": 16.6
+        },
+        {
+          "mw": 70,
+          "cost": 16.6
+        },
+        {
+          "mw": 80,
+          "cost": 16.6
+        },
+        {
+          "mw": 90,
+          "cost": 16.6
+        },
+        {
+          "mw": 100,
+          "cost": 16.6
+        },
+        {
+          "mw": 110,
+          "cost": 16.6
+        },
+        {
+          "mw": 130,
+          "cost": 16.6
+        }
+      ]
+    },
+
+    "G4_1": {
+      "must_run": 0,
+      "name": "G4",
+      "power_output_minimum": 20,
+      "power_output_maximum": 130,
+      "ramp_up_limit": 50,
+      "ramp_down_limit": 50,
+      "ramp_startup_limit": 20,
+      "ramp_shutdown_limit": 20,
+      "time_up_minimum": 5,
+      "time_down_minimum": 5,
+      "power_output_t0": 20,
+      "unit_on_t0": 1,
+      "time_up_t0": 5,
+      "time_down_t0": 0,
+      "fixed_cost": 680,
+      "startup": [
+        {
+          "lag": 5,
+          "cost": 560
+        },
+        {
+          "lag": 10,
+          "cost": 1120
+        },
+        {
+          "lag": 24,
+          "cost": 1120
+        }
+      ],
+      "piecewise_production": [
+        {
+          "mw": 20,
+          "cost": 16.5
+        },
+        {
+          "mw": 30,
+          "cost": 16.5
+        },
+        {
+          "mw": 40,
+          "cost": 16.5
+        },
+        {
+          "mw": 50,
+          "cost": 16.5
+        },
+        {
+          "mw": 60,
+          "cost": 16.5
+        },
+        {
+          "mw": 70,
+          "cost": 16.5
+        },
+        {
+          "mw": 80,
+          "cost": 16.5
+        },
+        {
+          "mw": 90,
+          "cost": 16.5
+        },
+        {
+          "mw": 100,
+          "cost": 16.5
+        },
+        {
+          "mw": 110,
+          "cost": 16.5
+        },
+        {
+          "mw": 130,
+          "cost": 16.5
+        }
+      ]
+    },
+
+    "G5_1": {
+      "must_run": 0,
+      "name": "G5",
+      "power_output_minimum": 25,
+      "power_output_maximum": 162,
+      "ramp_up_limit": 60,
+      "ramp_down_limit": 60,
+      "ramp_startup_limit": 25,
+      "ramp_shutdown_limit": 25,
+      "time_up_minimum": 6,
+      "time_down_minimum": 6,
+      "power_output_t0": 25,
+      "unit_on_t0": 1,
+      "time_up_t0": 6,
+      "time_down_t0": 0,
+      "fixed_cost": 450,
+      "startup": [
+        {
+          "lag": 6,
+          "cost": 900
+        },
+        {
+          "lag": 11,
+          "cost": 1800
+        },
+        {
+          "lag": 24,
+          "cost": 1800
+        }
+      ],
+      "piecewise_production": [
+        {
+          "mw": 25,
+          "cost": 19.7
+        },
+        {
+          "mw": 37.45454545,
+          "cost": 19.7
+        },
+        {
+          "mw": 49.909090899999995,
+          "cost": 19.7
+        },
+        {
+          "mw": 62.36363634999999,
+          "cost": 19.7
+        },
+        {
+          "mw": 74.81818179999999,
+          "cost": 19.7
+        },
+        {
+          "mw": 87.27272724999999,
+          "cost": 19.7
+        },
+        {
+          "mw": 99.72727269999999,
+          "cost": 19.7
+        },
+        {
+          "mw": 112.18181814999998,
+          "cost": 19.7
+        },
+        {
+          "mw": 124.63636359999998,
+          "cost": 19.7
+        },
+        {
+          "mw": 137.09090905,
+          "cost": 19.7
+        },
+        {
+          "mw": 162,
+          "cost": 19.7
+        }
+      ]
+    },
+
+    "G6_1": {
+      "must_run": 0,
+      "name": "G6",
+      "power_output_minimum": 20,
+      "power_output_maximum": 80,
+      "ramp_up_limit": 60,
+      "ramp_down_limit": 60,
+      "ramp_startup_limit": 20,
+      "ramp_shutdown_limit": 20,
+      "time_up_minimum": 3,
+      "time_down_minimum": 3,
+      "power_output_t0": 20,
+      "unit_on_t0": 1,
+      "time_up_t0": 3,
+      "time_down_t0": 0,
+      "fixed_cost": 370,
+      "startup": [
+        {
+          "lag": 3,
+          "cost": 170
+        },
+        {
+          "lag": 8,
+          "cost": 340
+        },
+        {
+          "lag": 24,
+          "cost": 340
+        }
+      ],
+      "piecewise_production": [
+        {
+          "mw": 20,
+          "cost": 22.26
+        },
+        {
+          "mw": 25.454545455,
+          "cost": 22.26
+        },
+        {
+          "mw": 30.909090910000003,
+          "cost": 22.26
+        },
+        {
+          "mw": 36.363636365000005,
+          "cost": 22.26
+        },
+        {
+          "mw": 41.81818182000001,
+          "cost": 22.26
+        },
+        {
+          "mw": 47.27272727500001,
+          "cost": 22.26
+        },
+        {
+          "mw": 52.72727273000001,
+          "cost": 22.26
+        },
+        {
+          "mw": 58.18181818500001,
+          "cost": 22.26
+        },
+        {
+          "mw": 63.63636364000001,
+          "cost": 22.26
+        },
+        {
+          "mw": 69.09090909500001,
+          "cost": 22.26
+        },
+        {
+          "mw": 80,
+          "cost": 22.26
+        }
+      ]
+    },      
+    
+    "G7_1": {
+      "must_run": 0,
+      "name": "G7",
+      "power_output_minimum": 25,
+      "power_output_maximum": 85,
+      "ramp_up_limit": 60,
+      "ramp_down_limit": 60,
+      "ramp_startup_limit": 25,
+      "ramp_shutdown_limit": 25,
+      "time_up_minimum": 3,
+      "time_down_minimum": 3,
+      "power_output_t0": 25,
+      "unit_on_t0": 1,
+      "time_up_t0": 3,
+      "time_down_t0": 0,
+      "fixed_cost": 480,
+      "startup": [
+        {
+          "lag": 3,
+          "cost": 260
+        },
+        {
+          "lag": 6,
+          "cost": 520
+        },
+        {
+          "lag": 24,
+          "cost": 520
+        }
+      ],
+      "piecewise_production": [
+        {
+          "mw": 25,
+          "cost": 27.74
+        },
+        {
+          "mw": 30.454545455,
+          "cost": 27.74
+        },
+        {
+          "mw": 35.90909091,
+          "cost": 27.74
+        },
+        {
+          "mw": 41.363636365000005,
+          "cost": 27.74
+        },
+        {
+          "mw": 46.81818182000001,
+          "cost": 27.74
+        },
+        {
+          "mw": 52.27272727500001,
+          "cost": 27.74
+        },
+        {
+          "mw": 57.72727273000001,
+          "cost": 27.74
+        },
+        {
+          "mw": 63.18181818500001,
+          "cost": 27.74
+        },
+        {
+          "mw": 68.63636364000001,
+          "cost": 27.74
+        },
+        {
+          "mw": 74.09090909500001,
+          "cost": 27.74
+        },
+        {
+          "mw": 85,
+          "cost": 27.74
+        }
+      ]
+    },
+
+    "G8_1": {
+      "must_run": 0,
+      "name": "G8",
+      "power_output_minimum": 10,
+      "power_output_maximum": 55,
+      "ramp_up_limit": 135,
+      "ramp_down_limit": 135,
+      "ramp_startup_limit": 10,
+      "ramp_shutdown_limit": 10,
+      "time_up_minimum": 1,
+      "time_down_minimum": 1,
+      "power_output_t0": 10,
+      "unit_on_t0": 1,
+      "time_up_t0": 1,
+      "time_down_t0": 0,
+      "fixed_cost": 660,
+      "startup": [
+        {
+          "lag": 1,
+          "cost": 30
+        },
+        {
+          "lag": 2,
+          "cost": 60
+        },
+        {
+          "lag": 24,
+          "cost": 60
+        }
+      ],
+      "piecewise_production": [
+        {
+          "mw": 10,
+          "cost": 25.92
+        },
+        {
+          "mw": 14.090909091,
+          "cost": 25.92
+        },
+        {
+          "mw": 18.181818182,
+          "cost": 25.92
+        },
+        {
+          "mw": 22.272727273,
+          "cost": 25.92
+        },
+        {
+          "mw": 26.363636364,
+          "cost": 25.92
+        },
+        {
+          "mw": 30.454545455,
+          "cost": 25.92
+        },
+        {
+          "mw": 34.545454546,
+          "cost": 25.92
+        },
+        {
+          "mw": 38.636363637,
+          "cost": 25.92
+        },
+        {
+          "mw": 42.727272728,
+          "cost": 25.92
+        },
+        {
+          "mw": 46.818181819,
+          "cost": 25.92
+        },
+        {
+          "mw": 55,
+          "cost": 25.92
+        }
+      ]
+    }
+  },
+    
+  "loads": {
+    "l1": {
+      "name": "l1",
+      "piecewise_production": [
+        {
+          "mw": 30,
+          "cost": 22
+        },
+        {
+          "mw": 20,
+          "cost": 23
+        },
+        {
+          "mw": 10,
+          "cost": 24
+        },
+        {
+          "mw": 5,
+          "cost": 25
+        },
+        {
+          "mw": 0,
+          "cost": 0
+        }
+      ]
+    }    
+  },
+    
+  "operative_zones": {
+      "GRO":[1,3],     
+      "oz": [
+        {
+          "min": 0,
+          "max": 35
+        },
+        {
+          "min": 40,
+          "max": 75
+        },
+        {
+          "min": 80,
+          "max": 100
+        }
+      ] 
+  },
+    
+  "ORDC": {
+    "ordc": [
+      {
+        "mw": 2,
+        "bid": 30
+      },
+      {
+        "mw": 4,
+        "bid": 29
+      },
+      {
+        "mw": 6,
+        "bid": 28
+      },
+      {
+        "mw": 8,
+        "bid": 24
+      },
+      {
+        "mw": 10,
+        "bid": 23
+      },
+      {
+        "mw": 12,
+        "bid": 22
+      },
+      {
+        "mw": 14,
+        "bid": 18
+      },
+      {
+        "mw": 16,
+        "bid": 16
+      },
+      {
+        "mw": 18,
+        "bid": 14
+      },
+      {
+        "mw": 20,
+        "bid": 5
+      },
+      {
+        "mw": 22,
+        "bid": 4
+      },
+      {
+        "mw": 24,
+        "bid": 3
+      }
+    ]
+  }
+    
+
+
+
+}
