@@ -1,8 +1,8 @@
 import json
 import util
-# import shutil
 import os
 import pandas as pd
+from  math import floor , ceil
 
 def reading(file):
     with open(file) as json_file:
@@ -13,6 +13,8 @@ def reading(file):
     S       = {}   ## eslabones de costo variable de arranque
     L       = {}   ## eslabones de costo en piecewise
     C       = {}   ## cost of segment of piecewise
+    TSg     = {}   ## eslabones trayectorias de subida
+    TDg     = {}   ## eslabones trayectorias de bajada 
     Pb      = {}   ## maximum power available for piecewise segment L for generator g (MW).
     Cb      = {}   ## cost of generator g producing Pb MW of power ($/h).
     De      = {}   ## load
@@ -34,12 +36,10 @@ def reading(file):
     Cs      = {}   ## Costo de cada escalón del conjunto S de la función de costo variable de arranque.
     Tunder  = {}   ## lag de cada escalón del conjunto S de la función de costo variable de arranque.
     Startup = {}   ## start-up cost
-  
-    
         
     time_periods = int(md['time_periods'])
-    demand       = md['demand']  
-    reserves     = md['reserves']  
+    demand       =     md['demand']  
+    reserves     =     md['reserves']  
 
     for t in range(1, time_periods+1):
         T.append(t)    
@@ -52,7 +52,7 @@ def reading(file):
     for gen in md['thermal_generators']:  
         names_gens.append(gen)
         G.append(i)
-        i+=1
+        i += 1
         
     must_run             = []
     power_output_minimum = []
@@ -77,10 +77,16 @@ def reading(file):
     p_0_list             = []
     u_0_list             = []
     fixed_cost           = []
+    SUD                  = []
+    PSD                  = [] 
+    SDD                  = [] 
+    PSU                  = []
+    PSUindex             = []
+    PSDindex             = []
     abajo_min            = 0
     
     ## To get the data from the generators
-    i=1 ## Cuenta los generadores
+    i = 1 ## Cuenta los generadores
     for gen in names_gens:  
         must_run.append(md['thermal_generators'][gen]["must_run"]) #0,
         power_output_minimum.append(md['thermal_generators'][gen]["power_output_minimum"])#80
@@ -95,7 +101,7 @@ def reading(file):
         unit_on_t0.append(md['thermal_generators'][gen]["unit_on_t0"])#1
         time_up_t0.append(md['thermal_generators'][gen]["time_up_t0"])#1
         time_down_t0.append(md['thermal_generators'][gen]["time_down_t0"])#0        
-        try:
+        try: 
             fixed_cost.append(md['thermal_generators'][gen]["fixed_cost"] )        
             #print(md['thermal_generators'][gen]["fixed_cost"] )       
         except:
@@ -110,11 +116,11 @@ def reading(file):
         j = 0
         for piece in piecewise_production:
             lista_aux.append((piece['mw'],piece['cost']))
-            j+=1            
+            j += 1            
         Piecewise.append(lista_aux)
         
         lista = []
-        jj=1
+        jj = 1
         for ii in range(j-1):
             lista.append(jj)
             jj= jj+1
@@ -122,13 +128,13 @@ def reading(file):
                 
         ## Obtiene segmentos del costo variable de arranque
         lista_aux2 = []
-        lista2 = []
+        lista2     = []
         j = 1        
         for segment in startup:
             if segment['lag']>=time_down_minimum[i-1]:
                 lista_aux2.append((segment['lag'],segment['cost']))
                 lista2.append(j)
-                j+=1         
+                j += 1         
             
         Startup.append(lista_aux2)
         S[i] = lista2
@@ -166,11 +172,57 @@ def reading(file):
             print('estado=',gen,unit_on_t0[i-1])
         p_0_list.append(power_output_t0[i-1])
         ########################################################################
+        ## Calcularemos los periodos de arranque y las trayectorias de arranque   
+        j = 1
+        lista = [] 
+        if ramp_startup_limit[i-1] >= power_output_minimum[i-1]:
+            SUD.append(1)
+            PSU.append(power_output_minimum[i-1]) #¿ramp_startup_limit?
+            PSUindex.append((i,j))
+            lista.append(1)
+        else:
+            sud = ceil(power_output_minimum[i-1] / ramp_startup_limit[i-1])
+            SUD.append(sud+1)
+            delta = power_output_minimum[i-1] / sud
+            for j in range(1,sud+1+1):
+                PSU.append(delta*(j-1))
+                PSUindex.append((i,j))   
+                lista.append(j)
+                j = j + 1           
+        TSg[i] = lista    
+                
+        ## Calcularemos los periodos de apagado y las trayectorias de apagado  
+        j = 1        
+        lista = []
+        if ramp_shutdown_limit[i-1] >= power_output_minimum[i-1]:
+            SDD.append(1)
+            PSD.append(power_output_minimum[i-1])
+            PSDindex.append((i,j))
+            lista.append(1)
+        else:
+            sdd = ceil(power_output_minimum[i-1] / ramp_shutdown_limit[i-1])
+            SDD.append(sdd+1)
+            delta = power_output_minimum[i-1] / sdd
+            k = 1
+            for j in range(sdd+1+1,1,-1):
+                PSD.append(power_output_minimum[i-1] - delta*(k-1))
+                PSDindex.append((i,k))
+                lista.append(k)
+                k = k + 1
+        TDg[i] = lista    
                                  
-        i+=1;  ## Se incrementa un generador  
-                            
-       
-       
+        i += 1;  ## Se incrementa un generador  
+        
+    print('SUD PSU') #TSg
+    print(SUD ,PSU )#TSg
+    print('SDD PSD')#TDg
+    print(SDD ,PSD)#TDg
+        
+        
+    ## Termina lectura del JSON
+    ######################################################################################
+   
+   
     ## Se extraen los diccionarios Pb y C de la lista de listas Piecewise    
     k=0; n=0
     for i in Piecewise:
@@ -206,6 +258,7 @@ def reading(file):
             # print(k,",",n,",",j[0],",",j[1])
             Tunder[k,n] = j[0]
             Cs[k,n]     = j[1] 
+            
     
     ## Leemos cargas elásticas
     
@@ -232,27 +285,27 @@ def reading(file):
             j = 0
             for piece in piecewise_production_load:
                 lista_aux.append((piece['mw'],piece['cost']))
-                j+=1            
+                j += 1            
             Piecewise_load.append(lista_aux)
             lista = []
-            jj=1
+            jj = 1
             for ii in range(j):
                 lista.append(jj)
                 jj = jj + 1
             Ld[i] = lista
-            i+=1
+            i += 1
                     
-        k=0; n=0
+        k = 0; n = 0
         for i in Piecewise_load:
             # print(i)
-            k=k+1
-            n=1
+            k = k+1
+            n = 1
             for j in i:                
                 # print(j)
                 # print(k,",",n,",",j[0],",",j[1])
                 Pd[k,n] = j[0]
                 Cd[k,n] = j[1]               
-                n=n+1
+                n = n+1
         # print('Cd',Cd)
         # print('Pd',Pd)
 
@@ -292,8 +345,6 @@ def reading(file):
         
     except:        
         print('reading.py sin información de zonas prohibidas')
-
-
     
     # print('oz',oz)
     # print('noz',noz) 
@@ -302,7 +353,6 @@ def reading(file):
     # print('maxoz',maxoz)  
     # print('romin',romin)  
     # print('romax',romax)  
-
     
     # GRO    = [1, 3]
     # RO     = {1: [1, 2, 3], 3: [1, 2, 3]}
@@ -316,60 +366,34 @@ def reading(file):
     ## Aqui se pasan de arreglos a diccionarios como los usa Pyomo
     Pmax   = dict(zip(G, power_output_maximum))
     Pmin   = dict(zip(G, power_output_minimum))
-    UT     = dict(zip(G, time_up_minimum))     
-    DT     = dict(zip(G, time_down_minimum))  
-    u_0    = dict(zip(G, u_0_list))          
-    U      = dict(zip(G, Ulist))              
-    D      = dict(zip(G, Dlist))             
-    TD_0   = dict(zip(G, TD0list))                
-    SU     = dict(zip(G, ramp_startup_limit))
-    SD     = dict(zip(G, ramp_shutdown_limit))
-    RU     = dict(zip(G, ramp_up_limit))
-    RD     = dict(zip(G, ramp_down_limit))
-    p_0    = dict(zip(G, p_0_list))  
-    names  = dict(zip(G, names_gens))  
-    CR     = dict(zip(G, fixed_cost))
+    UT     = dict(zip(G, time_up_minimum     ))     
+    DT     = dict(zip(G, time_down_minimum   ))  
+    u_0    = dict(zip(G, u_0_list            ))          
+    U      = dict(zip(G, Ulist               ))              
+    D      = dict(zip(G, Dlist               ))             
+    TD_0   = dict(zip(G, TD0list             ))                
+    SU     = dict(zip(G, ramp_startup_limit  ))
+    SD     = dict(zip(G, ramp_shutdown_limit ))
     
-    RO     = dict(zip(GRO, oz))   
-    ROmin  = dict(zip(toz, romin))   
-    ROmax  = dict(zip(toz, romax))   
+    SUD    = dict(zip(G,       SUD           ))
+    PSU    = dict(zip(PSUindex,PSU           ))   
+    SDD    = dict(zip(G,       SDD           ))
+    PSD    = dict(zip(PSDindex,PSD           ))
+        
+    RU     = dict(zip(G, ramp_up_limit       ))
+    RD     = dict(zip(G, ramp_down_limit     ))
+    p_0    = dict(zip(G, p_0_list            ))  
+    names  = dict(zip(G, names_gens          ))  
+    CR     = dict(zip(G, fixed_cost          ))
     
+    RO     = dict(zip(GRO, oz                ))   
+    ROmin  = dict(zip(toz, romin             ))   
+    ROmax  = dict(zip(toz, romax             ))   
     
-
-    ## -----------------  Caso de ejemplo de anjos.json  --------------------------
-    #G        = [1, 2, 3]
-    #T        = [1, 2, 3, 4, 5, 6]
-    #L        = {1: [1, 2, 3], 2: [1, 2, 3], 3: [1, 2, 3, 4]}
-    #S        = {1: [1, 2, 3], 2: [1, 2, 3], 3: [1, 2, 3, 4]}
-    #Pmax     = {1: 300.0, 2: 200.0, 3: 100.0}
-    #Pmin     = {1: 80, 2: 50, 3: 30}
-    #UT       = {1: 3, 2: 2, 3: 1}
-    #DT       = {1: 2, 2: 2, 3: 2}
-    #De       = {1: 240, 2: 250, 3: 200, 4: 170, 5: 230, 6: 190}
-    #R        = {1: 10, 2: 10, 3: 10, 4: 10, 5: 10, 6: 10}
-    #u_0      = {1: 1, 2: 0, 3: 0}
-    #D        = {1: 0, 2: 0, 3: 0}
-    #U        = {1: 2, 2: 0, 3: 0}
-    #SU       = {1: 100, 2: 70, 3: 40}
-    #SD       = {1: 80, 2: 50, 3: 30}
-    #RU       = {1: 50, 2: 60, 3: 70}
-    #RD       = {1: 30, 2: 40, 3: 50}
-    #p_0     = {1: 40, 2: 0, 3: 0}
-    #CR      = {1: 400.0, 2: 750.0, 3: 900.0}
-    #Pb       = {(1, 1): 80, (1, 2): 150, (1, 3): 300, (2, 1): 50, (2, 2): 100, (2, 3): 200, (3, 1): 30, (3, 2): 50, (3, 3): 70, (3, 4): 100}   
-    #C        = {(1, 1): 5.0, (1, 2): 5.0, (1, 3): 5.0, (2, 1): 15.0, (2, 2): 15.0, (2, 3): 15.0, (3, 1): 30.0, (3, 2): 30.0, (3, 3): 30.0, (3, 4): 30.0}
-    #Cs       = {(1, 1): 800.0, (1, 2): 800.0, (1, 3): 800.0, (2, 1): 500.0, (2, 2): 500.0, (2, 3): 500.0, (3, 1): 25.0, (3, 2): 250.0, (3, 3): 
-    #500.0, (3, 4): 1000.0}
-    #Tunder     = {(1, 1): 2, (1, 2): 3, (1, 3): 4, (2, 1): 2, (2, 2): 3, (2, 3): 4, (3, 1): 2, (3, 2): 3, (3, 3): 4, (3, 4): 5}
-    #fixShedu = False
-    #relax    = False
-    #ambiente = 'localPC'
-    ## ----------------------------------  o  -------------------------------------
-
     ## Para obtener los Psu y los Psd 
-    for i in Pmin:
-        if SU[1]<Pmin[i]:
-            print('Pmin',Pmin[i],SU[1])
+    # for i in Pmin:
+    #     if SU[1]<Pmin[i]:
+    #         print('Pmin',Pmin[i],SU[1])
             
     ## Artificialmente creamos ofertas de venta de reservas    
     Crr   = []  
@@ -384,8 +408,7 @@ def reading(file):
     RN10  = []   
     RN30  = []  
     ORDC  = [] ## Segments of ORDC
-    RCO   = [] ## Limits of MW for each ORDC segment
-    
+    RCO   = [] ## Limits of MW for each ORDC segment   
         
     RCO.append(24.0)   # 5 MW    
     RCO.append(22.0)   # 5 MW       
@@ -423,11 +446,11 @@ def reading(file):
         Cs30.append( 1.0) # $ 1
         Cns10.append(1.0) # $ 1
         Cns30.append(1.0) # $ 1
-        RRe.append(2.0) # $ 1
-        RR10.append(2.0) # $ 1
-        RR30.append(2.0) # $ 1
-        RN10.append(2.0) # $ 1
-        RN30.append(2.0) # $ 1
+        RRe.append(2.0)   # $ 1
+        RR10.append(2.0)  # $ 1
+        RR30.append(2.0)  # $ 1
+        RN10.append(2.0)  # $ 1
+        RN30.append(2.0)  # $ 1
            
     Crr      = dict(zip(G    , Crr   ))
     Cs10     = dict(zip(G    , Cs10  ))
@@ -441,10 +464,12 @@ def reading(file):
     RN30     = dict(zip(G    , RN30  ))
     Cordc    = dict(zip(ORDC , Cordc ))
     RCO      = dict(zip(ORDC , RCO   ))
-        
-    instance = [G,T,L,S,Pmax,Pmin,UT,DT,De,R,u_0,U,D,TD_0,SU,SD,RU,RD,p_0,Pb,Cb,C,CR,Cs,Tunder,names,
+
+    instance = [G,T,L,S,Pmax,Pmin,UT,DT,De,R,u_0,U,D,TD_0,SU,SUD,PSD,SD,SDD,PSU,RU,RD,p_0,Pb,Cb,C,CR,Cs,Tunder,names,
                 LOAD,Ld,Pd,Cd, 
                 GRO,RO,ROmin,ROmax, 
-                Crr,Cs10,Cs30,Cns10,Cns30,RRe,RR10,RR30,RN10,RN30,ORDC,Cordc,RCO]
+                Crr,Cs10,Cs30,Cns10,Cns30,RRe,RR10,RR30,RN10,RN30,ORDC,Cordc,RCO,
+                TSg,TDg]
+        
             
     return instance

@@ -9,7 +9,7 @@ from   math import ceil
 
 class Solution:
     def __init__(self,model,env,executable,nameins='model',letter='',gap=0.0001,timelimit=300,tee=False,tofiles=False,lpmethod=0,
-                 cutoff=1e+75,emphasize=1,lbheur='no',symmetry=-1,strategy=1,exportLP=False,option='',scope='',rc=False,dual=False):
+                 cutoff=1e+75,emphasize=1,lbheur='no',symmetry=-1,strategy=1,exportLP=False,option='',rc=False,dual=False):
         self.model      = model
         self.nameins    = nameins     ## name of instance 
         self.letter     = letter      ## letter that enlisted the LBC iteration
@@ -29,13 +29,11 @@ class Solution:
         self.exportLP   = exportLP    ## True si se exporta el modelo a formato LP y MPS
         self.gg         = len(model.G)
         self.tt         = len(model.T)
-        if scope == 'market':
-            self.ll     = len(model.LOAD)
+        self.ll         = len(model.LOAD)
         self.S          = model.S
         self.gap_       = 1e+75       ## relative gap calculated with #|bestbound-bestinteger|/(1e-10+|bestinteger|)
         self.z_exact    = 1e+75
         self.option     = option
-        self.scope      = scope
         self.fail       = False
         self.timeover   = False
         self.infeasib   = False
@@ -176,8 +174,7 @@ class Solution:
                 self.R     = deepcopy(self.Uu)
                 self.delta = deepcopy(self.Uu)
                 
-                if self.scope == 'market':
-                    self.L    = [[0 for i in range(self.tt)] for j in range(self.ll)]
+                self.L    = [[0 for i in range(self.tt)] for j in range(self.ll)]
                         
                 # self.snplus   = [0 for i in range(self.tt)]     
                 # self.snminus  = [0 for i in range(self.tt)]
@@ -194,10 +191,10 @@ class Solution:
                         self.Uu[g][t] = round(self.model.u[(g+1, t+1)].value,5)
                         self.V [g][t] = round(self.model.v[(g+1, t+1)].value,5)
                         self.W [g][t] = round(self.model.w[(g+1, t+1)].value,5)
-                        self.P [g][t] = round(self.model.p[(g+1, t+1)].value,5)
-                        self.R [g][t] = round(self.model.r[(g+1, t+1)].value,5)
+                        self.P [g][t] = round(self.model.e[(g+1, t+1)].value,5)
+                        #self.R [g][t] = round(self.model.r[(g+1, t+1)].value,5)
                         
-                if self.scope == 'market':
+                if True:
                     for t in range(0, self.tt):
                         for l in range(0, self.ll):
                             self.L [l][t] = round(self.model.l[(l+1, t+1)].value,5)
@@ -239,17 +236,17 @@ class Solution:
         # util.sendtofilesolution(self.P     ,'P_'   + self.nameins + letra +'.csv')
         # util.sendtofilesolution(self.R     ,'R_'   + self.nameins + letra +'.csv')
         # util.sendtofilesolution(self.delta ,'del_' + self.nameins + letra +'.csv')
-        # if self.scope == 'market':
+        # if True:
         #     util.sendtofilesolution(self.L     ,'l_'   + self.nameins + letra +'.csv')
         
         file = open(self.nameins + letra + '.dat', 'w')
         file.write('z:%s\n' % (value(self.model.obj)))
-        file.write('g,t,u,v,w,p\n') 
+        file.write('t,g,u,v,w,p\n') 
             
         for g in range(0, self.gg):
             for t in range(0, self.tt):
                 file.write('%s,%s,%s,%s,%s,%s\n' %
-                ( int(t), int(g), ceil(self.model.u[(g+1, t+1)].value),ceil(self.model.v[(g+1, t+1)].value),ceil(self.model.w[(g+1, t+1)].value), util.trunc(self.model.p[(g+1, t+1)].value,4)))
+                ( int(t), int(g), ceil(self.model.u[(g+1, t+1)].value),ceil(self.model.v[(g+1, t+1)].value),ceil(self.model.w[(g+1, t+1)].value), util.trunc(self.model.e[(g+1, t+1)].value,4)))
 
         # file.write('TIME,s,sR\n')
         # for t in range(1, self.tt+1):

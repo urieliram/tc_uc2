@@ -377,73 +377,73 @@
       "power_output_maximum": 162,
       "ramp_up_limit": 60,
       "ramp_down_limit": 60,
-      "ramp_startup_limit": 25,
-      "ramp_shutdown_limit": 25,
+      "ramp_startup_limit": 5,
+      "ramp_shutdown_limit": 5,
       "time_up_minimum": 6,
       "time_down_minimum": 6,
-      "power_output_t0": 25,
-      "unit_on_t0": 1,
-      "time_up_t0": 6,
-      "time_down_t0": 0,
-      "fixed_cost": 450,
+      "power_output_t0": 0,
+      "unit_on_t0": 0,
+      "time_up_t0": 0,
+      "time_down_t0": 6,
+      "fixed_cost": 10,
       "startup": [
         {
           "lag": 6,
-          "cost": 900
+          "cost": 10
         },
         {
           "lag": 11,
-          "cost": 1800
+          "cost": 20
         },
         {
           "lag": 24,
-          "cost": 1800
+          "cost": 50
         }
       ],
       "piecewise_production": [
         {
           "mw": 25,
-          "cost": 19.7
+          "cost": 10
         },
         {
           "mw": 37.45454545,
-          "cost": 19.7
+          "cost": 10
         },
         {
           "mw": 49.909090899999995,
-          "cost": 19.7
+          "cost": 10
         },
         {
           "mw": 62.36363634999999,
-          "cost": 19.7
+          "cost": 10
         },
         {
           "mw": 74.81818179999999,
-          "cost": 19.7
+          "cost": 10
         },
         {
           "mw": 87.27272724999999,
-          "cost": 19.7
+          "cost": 10
         },
         {
           "mw": 99.72727269999999,
-          "cost": 19.7
+          "cost": 10
         },
         {
           "mw": 112.18181814999998,
-          "cost": 19.7
+          "cost": 10
         },
         {
           "mw": 124.63636359999998,
-          "cost": 19.7
+          "cost": 10
         },
         {
           "mw": 137.09090905,
-          "cost": 19.7
+          "cost": 10
         },
         {
           "mw": 162,
-          "cost": 19.7
+          "cost": 10
         }
       ]
     },
@@ -708,7 +708,24 @@
           "cost": 0
         }
       ]
-    }    
+    },
+    "l2": {
+      "name": "l2",
+      "piecewise_production": [
+        {
+          "mw": 30,
+          "cost": 22
+        },
+        {
+          "mw": 20,
+          "cost": 23
+        },
+        {
+          "mw": 10,
+          "cost": 24
+        }
+      ]
+    }  
   },
     
   "operative_zones": {
