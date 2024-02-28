@@ -696,10 +696,6 @@ def uc(instance,option='None',
                 return Constraint.Skip                            
         model.Piecewise_offer48b = Constraint(model.indexGTLg, rule = Piecewise_offer48b)    
     
-    def merge8(): 
-        a=1         
-    def merge8b():   
-        a=1
         
     ## ----------------------------SIMPLE COST PRODUCTION (HYDRO)-------------------------------------------  
     # Pending ...    
@@ -740,10 +736,6 @@ def uc(instance,option='None',
                             if t > max(model.Tunder[g,s+1]-TD_0[g],1):
                                 model.delta[g,t,s].fix(0)
                                 # print('fix delta:',g,t,s)  
-                      
-    #enforce2()                 
-    def merge9():
-        a=1
                                 
     if  False:   
         ## ----------------------- ELASTIC LOADS (PURCHASE BID) ----------------------------   
@@ -776,10 +768,7 @@ def uc(instance,option='None',
             # print('Pd_max',m.Pd[d,1]) 
             return m.l[d,t] <= m.Pd[d,1]       
         model.load_bid_max        = Constraint(model.LOAD, model.T, rule = load_bid_max)
-                                            
-        def merge10():
-            a=1                                                                       
-
+                        
     if False:
         ## ----------------------- PROHIBID OPERATING ZONES ----------------------------  
         def prohibid_operative_zones_min(m,g,t,ro):  
@@ -797,11 +786,8 @@ def uc(instance,option='None',
         def prohibid_operative_zones2(m,g,t):  
             return  sum( m.ec_RO[g,t,ro] for ro in m.RO[g] ) == m.ec[g,t]                             
         model.prohibid_operative_zones2    = Constraint(model.indexGRO_T,   rule=prohibid_operative_zones2)
-                             
-        def merge11(): 
-            a=1
 
-    if False:     
+    if True:     
         ## ----------------------- RESERVE OFFERS ----------------------------
         def total_reg_rule(m,t):     ## to account the regulation reserve met
             return sum( m.rre[g,t] 
@@ -846,228 +832,6 @@ def uc(instance,option='None',
         def limit_rn30_rule(m,g,t):  ## limits of non-spinning reserve 30
             return m.rn30[g,t] <= m.RN30[g] * (1- m.u[g,t])
         model.limit_rn30_rule = Constraint(model.G, model.T, rule = limit_rn30_rule)
-
-
-        def merge12(): 
-            aux=1
-        
-    ## ---------------------------- LOCAL BRANCHING CONSTRAINT LBC 1 (SOFT-FIXING)------------------------------------------    
-    ## Define a neighbourhood with LBC1.    
-    if(option == 'lbc1'):
-                  
-        for f in No_SB_Uu:   
-            model.u[f[0]+1,f[1]+1].domain = UnitInterval    ## We remove the integrality constraint of the Binary Support 
-            if improve == True:          
-                model.u[f[0]+1,f[1]+1] = 0                  ## Hints
-        for f in SB_Uu:  
-            model.u[f[0]+1,f[1]+1].domain = UnitInterval    ## We remove the integrality constraint of the Binary Support 
-            if improve == True:          
-                model.u[f[0]+1,f[1]+1] = 1                  ## Hints
-            
-        ## Hints para iniciar desde la última solución válida
-        #if improve ==True:
-        for g in range(len(G)):
-            for t in range(len(T)):
-                model.v[g+1,t+1] = V[g][t]                  ## Hints
-                model.w[g+1,t+1] = W[g][t]                  ## Hints
-                if delta[g][t]  != 0:
-                    model.delta[g+1,t+1,delta[g][t]] = 1    ## Hints
-                    
-        model.cuts = ConstraintList()
-        
-        # Soft-fixing: adding a new restriction 
-        if True:
-            ## https://pyomo.readthedocs.io/en/stable/working_models.html
-            inside90   = ceil((percent_soft/100) * (len(SB_Uu))) #-len(lower_Pmin_Uu)
-            expr       = 0        
-            ## Se hace inside90 = 90% solo a el - Soporte Binario -  
-            for f in SB_Uu:
-                expr += model.u[f[0]+1,f[1]+1]
-            model.cuts.add(expr >= inside90)
-            print(option,'variables Uu that SB_Uu=1 <= inside90  =', inside90)
-            # outside90 = len(SB_Uu)-inside90
-            # print(option,'variables Uu that SB_Uu=0 <= outside90 =', outside90)
-            
-        
-        ## Local Branching Constraint (LBC)     
-        if True:            
-            ## Adding a new restrictions LEFT-BRANCH  <°|((><
-            if improve == True or (timeover==True and improve == False) : 
-                print('Adding  1  left-branch: ∑lower_Pmin_Uu + ∑SB_Uu ≤',k)                
-                expr = 0      
-                for f in SB_Uu:                             ## Cuenta los cambios de 1 --> 0  
-                    expr += 1 - model.u[f[0]+1,f[1]+1] 
-                for f in lower_Pmin_Uu :  # No_SB_Uu        ## Cuenta los cambios de 0 --> 1 
-                    expr +=     model.u[f[0]+1,f[1]+1]              
-                model.cuts.add(expr <= k)      
-        
-            ## Adding a new restrictions RIGHT-BRANCH  >>++++++++|°> . o O
-            print('Adding ',len(rightbranches),' right-branches:  ∑lower_Pmin_Uu + ∑SB_Uu ≥',k,'+ 1')
-            for cut in rightbranches:
-                expr = 0      
-                ## cut[1]=No_SB_Uu   cut[2]=lower_Pmin_Uu  cut[0]=SB_Uu   
-                for f in cut[0]:  ## NUNCA SE MUEVE         ## Cuenta los cambios de 1 --> 0  
-                    expr += 1 - model.u[f[0]+1,f[1]+1] 
-                for f in cut[2]:  # cut[1]                  ## Cuenta los cambios de 0 --> 1 
-                    expr +=     model.u[f[0]+1,f[1]+1] 
-                model.cuts.add(expr >= k + 1)
-                
-               
-    ## ---------------------------- LOCAL BRANCHING CONSTRAINT LBC2 (INTEGER VERSION)------------------------------------------    
-    ## Define a neighbourhood with LBC2.       
-    if(option == 'lbc2'):
-                  
-        for f in No_SB_Uu:   
-            model.u[f[0]+1,f[1]+1].domain = Binary    ## We remove the integrality constraint of the Binary Support 
-            if improve == True:          
-                model.u[f[0]+1,f[1]+1] = 0            ## Hints
-        for f in SB_Uu:  
-            model.u[f[0]+1,f[1]+1].domain = Binary    ## We remove the integrality constraint of the Binary Support 
-            if improve == True:          
-                model.u[f[0]+1,f[1]+1] = 1            ## Hints
-            
-        ## Hints para iniciar desde la última solución válida
-        #if improve == True:
-        for g in range(len(G)):
-            for t in range(len(T)):
-                model.v[g+1,t+1] = V[g][t]                  ## Hints
-                model.w[g+1,t+1] = W[g][t]                  ## Hints
-                if delta[g][t]  != 0:
-                    model.delta[g+1,t+1,delta[g][t]] = 1    ## Hints
-        
-        model.cuts = ConstraintList()
-        
-        ## Local Branching Constraint (LBC) 
-        if True:            
-            ## Adding a new restrictions LEFT-BRANCH  <°|((><
-            if improve == True or (timeover==True and improve == False) : 
-                print('Adding  1  left-branch: ∑lower_Pmin_Uu  + ∑SB_Uu ≤',k)                
-                expr = 0      
-                for f in SB_Uu:                             ## Cuenta los cambios de 1 --> 0  
-                    expr += 1 - model.u[f[0]+1,f[1]+1] 
-                for f in lower_Pmin_Uu :  # No_SB_Uu        ## Cuenta los cambios de 0 --> 1 
-                    expr +=     model.u[f[0]+1,f[1]+1]              
-                model.cuts.add(expr <= k)      
-        
-            ## Adding a new restrictions RIGHT-BRANCH  >>++++++++|°> . o O
-            print('Adding ',len(rightbranches),' right-branches:  ∑lower_Pmin_Uu  + ∑SB_Uu ≥',k,'+ 1')
-            for cut in rightbranches:
-                expr = 0      
-                ## cut[1]=No_SB_Uu   cut[2]=lower_Pmin_Uu  cut[0]=SB_Uu   
-                for f in cut[0]:  ## NO MOVER NUNCA         ## Cuenta los cambios de 1 --> 0  
-                    expr += 1 - model.u[f[0]+1,f[1]+1] 
-                for f in cut[2]:  # cut[1]                  ## Cuenta los cambios de 0 --> 1 
-                    expr +=     model.u[f[0]+1,f[1]+1] 
-                model.cuts.add(expr >= k + 1)
-                
-
-    ## ---------------------------- HARD VARIABLE FIXING I  ------------------------------------------
-    ##     
-    if option == 'Hard':
-        for f in SB_Uu:
-            model.u[f[0]+1,f[1]+1].fix(1)                   ## Hard fixing
-        for f in No_SB_Uu: 
-            model.u[f[0]+1,f[1]+1] = 0                      ## Hints
-        for f in lower_Pmin_Uu:
-            model.u[f[0]+1,f[1]+1] = 0                      ## Hints
-            
-    ## ---------------------------- HARD VARIABLE FIXING III------------------------------------------
-    ##     
-    if option == 'Hard3':
-        model.u.fix(0)                                      ## Hard fixing
-        for f in SB_Uu:       
-            model.u[f[0]+1,f[1]+1].unfix()                  ## Hard fixing
-            model.u[f[0]+1,f[1]+1] = 1                      ## Hints   
-        # for f in No_SB_Uu: 
-        #     model.u[f[0]+1,f[1]+1].fix(0)                 ## Hard fixing
-        for f in lower_Pmin_Uu:
-            model.u[f[0]+1,f[1]+1].unfix()    
-            model.u[f[0]+1,f[1]+1] = 0                      ## Hints
-     
-    ## ---------------------------- CHECK FEASIABILITY ------------------------------------------
-    ## 
-    if option == 'Check':  
-        
-        for f in SB_Uu: 
-            model.u[f[0]+1,f[1]+1].domain = Binary 
-            model.u[f[0]+1,f[1]+1].fix(1)                   ## Hard fixing
-        for f in No_SB_Uu: 
-            model.u[f[0]+1,f[1]+1].domain = Binary 
-            model.u[f[0]+1,f[1]+1].fix(0)                   ## Hard fixing
-        for g in range(0,len(model.G)):
-            for t in range(0,len(model.T)):
-                model.v[g+1,t+1].domain   = Binary 
-                model.v[g+1,t+1].fix( V[g][t] )             ## Hard fixing
-                model.w[g+1,t+1].domain   = Binary 
-                model.w[g+1,t+1].fix( W[g][t] )             ## Hard fixing
-                if delta[g][t] != 0:
-                    model.delta[g+1,t+1,delta[g][t]].domain = Binary 
-                    model.delta[g+1,t+1,delta[g][t]].fix(1) ## Hard fixing
-
-    ## ---------------------------- FIX SOLUTION LINEAR ------------------------------------------
-    ## 
-    if option == 'FixSol':  
-        
-        for f in SB_Uu: 
-            model.u[f[0]+1,f[1]+1].fix(1)                   ## Hard fixing
-        for f in No_SB_Uu: 
-            model.u[f[0]+1,f[1]+1].fix(0)                   ## Hard fixing
-        for g in range(0,len(model.G)):
-            for t in range(0,len(model.T)):
-                model.v[g+1,t+1].fix( V[g][t] )             ## Hard fixing
-                model.w[g+1,t+1].fix( W[g][t] )             ## Hard fixing
-                if delta[g][t] != 0:
-                    model.delta[g+1,t+1,delta[g][t]].fix(1) ## Hard fixing
-                                
-    ## ---------------------------- REDUCED COST ------------------------------------------
-    ## 
-    if option == 'RC':                             
-        for f in SB_Uu: 
-            model.u[f[0]+1,f[1]+1].setlb(1.0)                 ## Fix upper bound
-                    
-    ## ---------------------------- KERNEL SEARCH ------------------------------------------
-    ##
-    if option == 'KS' :    
-        model.u.fix(0)                                      ## Hard fixing
-        for f in kernel: 
-            model.u[f[0]+1,f[1]+1].unfix()  
-            model.u[f[0]+1,f[1]+1] = 1                      ## Hints
-        for f in bucket: 
-            model.u[f[2]+1,f[3]+1].unfix()                  
-            model.u[f[2]+1,f[3]+1] = 0                      ## Hints
-            
-        model.cuts = ConstraintList()
-        expr       = 0      
-        for f in bucket:                                    ## Cuenta los elementos del bucket
-            expr += model.u[f[2]+1,f[3]+1] 
-        model.cuts.add(expr >= 1)            
-        
-  
-        
-    ## Creating thread
-    # t1  = threading.Thread(target=merge1)
-    # t2  = threading.Thread(target=merge2)    
-    # t3  = threading.Thread(target=merge3)    
-    # t4  = threading.Thread(target=merge4)    
-    # t5  = threading.Thread(target=merge5)  
-    # t6  = threading.Thread(target=merge6)   
-    # t7  = threading.Thread(target=merge7)   
-    # t8  = threading.Thread(target=merge8)   
-    # t8b = threading.Thread(target=merge8b)   
-    # t9  = threading.Thread(target=merge9)  
-      
-    # t10 = threading.Thread(target=merge10)
-    # t11 = threading.Thread(target=merge11)
-    # t12 = threading.Thread(target=merge12)   
-
-    # t1.start(); t2.start(); t3.start(); t4.start(); t5.start(); t6.start(); t7.start(); t8.start(); t8b.start(); t9.start(); t10.start(); t11.start(); t12.start()   ## starting threads 
-    # t1.join();  t2.join();  t3.join();  t4.join();  t5.join();  t6.join();  t7.join();  t8.join();  t8b.join();  t9.join();  t10.join();  t11.join();  t12.join()   ## wait until thread 1 is completely executed     
-          
- 
- 
-    #print(option,"All threads completely executed!") # https://www.geeksforgeeks.org/multithreading-python-set-1/
-    
-
 
     return model, inside90
 
